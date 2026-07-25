@@ -1,7 +1,7 @@
 "use client";
 
 import { ChoiceChips } from "@/components/ChoiceChips";
-import { FlowHeader } from "@/components/FlowHeader";
+import { ProductHeader } from "@/components/layout/ProductHeader";
 import { LocationPickerSheet } from "@/components/LocationPickerSheet";
 import { QuestionSection } from "@/components/QuestionSection";
 import { SoloRestaurantResult } from "@/components/SoloRestaurantResult";
@@ -22,7 +22,7 @@ export default function SoloPage() {
 
   return (
     <main className="flow">
-      <FlowHeader backHref={flow.step ? undefined : "/choose"} />
+      <ProductHeader backHref={flow.step ? undefined : "/choose"} />
       <div className="flowBody">
         {flow.step < 4 && (
           <>

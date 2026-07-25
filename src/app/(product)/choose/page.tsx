@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { FlowHeader } from "@/components/FlowHeader";
+import { ProductHeader } from "@/components/layout/ProductHeader";
 export default function Choose() {
   return (
     <main className="flow">
-      <FlowHeader backHref="/" />
+      <ProductHeader backHref="/" />
       <section className="flowBody">
         <p className="progress">STEP 1</p>
         <h1>

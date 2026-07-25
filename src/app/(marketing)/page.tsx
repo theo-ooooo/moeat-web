@@ -1,14 +1,9 @@
 import Link from "next/link";
-import { SiteLogo } from "@/components/SiteLogo";
+import { HeroProductDemo } from "@/components/marketing/HeroProductDemo";
+import { HomeStep } from "@/components/marketing/HomeStep";
 export default function Home() {
   return (
-    <main className="landing">
-      <nav className="nav">
-        <SiteLogo />
-        <Link href="/choose" className="navCta">
-          바로 시작하기
-        </Link>
-      </nav>
+    <>
       <section className="hero">
         <div className="heroCopy">
           <span className="eyebrow">메뉴부터 맛집까지 · 30초</span>
@@ -42,7 +37,7 @@ export default function Home() {
             </span>
           </div>
         </div>
-        <ProductDemo />
+        <HeroProductDemo />
       </section>
       <section className="homeFeatures">
         <div className="featureIntro">
@@ -126,9 +121,21 @@ export default function Home() {
           맛있는 시간은 길게
         </h2>
         <div className="stepGrid">
-          <Step n="01" title="상황을 골라요" text="혼자인지 여럿인지 먼저 선택해요" />
-          <Step n="02" title="취향을 모아요" text="먹고 싶은 것과 못 먹는 것을 알려주세요" />
-          <Step n="03" title="메뉴를 만나요" text="모두에게 잘 맞는 세 가지를 추천해요" />
+          <HomeStep
+            number="01"
+            title="상황을 골라요"
+            description="혼자인지 여럿인지 먼저 선택해요"
+          />
+          <HomeStep
+            number="02"
+            title="취향을 모아요"
+            description="먹고 싶은 것과 못 먹는 것을 알려주세요"
+          />
+          <HomeStep
+            number="03"
+            title="메뉴를 만나요"
+            description="모두에게 잘 맞는 메뉴를 추천해요"
+          />
         </div>
       </section>
       <section className="banner">
@@ -147,86 +154,6 @@ export default function Home() {
           <strong>취향 입력 완료!</strong>
         </div>
       </section>
-      <footer>
-        <SiteLogo />
-        <p>혼자도 같이도, 오늘 뭐 먹을지 모잇.</p>
-      </footer>
-    </main>
-  );
-}
-function Step({ n, title, text }: { n: string; title: string; text: string }) {
-  return (
-    <article className={`step step${n}`}>
-      <small>STEP {n}</small>
-      <div className="stepPreview" aria-hidden="true">
-        {n === "01" && (
-          <>
-            <i>혼자</i>
-            <i>같이</i>
-          </>
-        )}
-        {n === "02" && (
-          <>
-            <i className="checked">든든하게</i>
-            <i>깔끔하게</i>
-            <i className="blocked">매운 음식 제외</i>
-          </>
-        )}
-        {n === "03" && (
-          <>
-            <span>
-              <b>1</b>
-              <strong>비빔밥</strong>
-              <em>94%</em>
-            </span>
-            <span>
-              <b>2</b>
-              <strong>쌀국수</strong>
-              <em>89%</em>
-            </span>
-          </>
-        )}
-      </div>
-      <h3>{title}</h3>
-      <p>{text}</p>
-    </article>
-  );
-}
-function ProductDemo() {
-  return (
-    <div className="productDemo">
-      <div className="demoWindow">
-        <div className="demoChrome">
-          <span />
-          <span />
-          <span />
-          <b>MOEAT PICK</b>
-        </div>
-        <div className="demoBody">
-          <small>STEP 2 OF 3</small>
-          <h2>오늘은 어떤 느낌인가요?</h2>
-          <div className="demoChips">
-            <span className="on">든든하게</span>
-            <span>가볍게</span>
-            <span className="on">깔끔하게</span>
-            <span>자극적으로</span>
-          </div>
-          <div className="demoResult">
-            <div className="demoRank">1</div>
-            <div>
-              <small>PICK 01</small>
-              <strong>비빔밥</strong>
-              <p>든든하고 깔끔한 한 끼에 잘 맞아요</p>
-            </div>
-            <i>→</i>
-          </div>
-        </div>
-      </div>
-      <div className="demoPlace">
-        <span>주변 맛집</span>
-        <strong>성수역 주변 비빔밥 맛집 5곳</strong>
-        <small>메뉴를 정하면 갈 곳까지 이어드려요</small>
-      </div>
-    </div>
+    </>
   );
 }

@@ -1,10 +1,11 @@
 "use client";
-import { use, useCallback, useEffect, useState } from "react";
-import { api, RestaurantSearch, Room, tokens } from "@/lib/api";
+import { use } from "react";
+import { Room } from "@/lib/api";
 import { mapLinks } from "@/lib/maps";
 import { ChoiceChips } from "@/components/ChoiceChips";
 import { FullPageState } from "@/components/FullPageState";
-import { FlowHeader } from "@/components/FlowHeader";
+import { ProductHeader } from "@/components/layout/ProductHeader";
+import { useRoom } from "@/hooks/useRoom";
 const likes = [
     "한식",
     "일식",
@@ -20,96 +21,16 @@ const likes = [
   exs = ["매운음식", "날것", "해산물", "육류", "유제품", "밀가루"];
 export default function RoomPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
-  const [room, setRoom] = useState<Room | null>(null),
-    [error, setError] = useState(""),
-    [name, setName] = useState(""),
-    [like, setLike] = useState<string[]>([]),
-    [exclude, setExclude] = useState<string[]>([]),
-    [restaurantSearch, setRestaurantSearch] = useState<RestaurantSearch | null>(null),
-    [busy, setBusy] = useState(false);
-  const host = typeof window !== "undefined" && !!tokens.host(code),
-    joined = typeof window !== "undefined" && !!tokens.participant(code);
-  const load = useCallback(async () => {
-    try {
-      const participantToken = tokens.participant(code);
-      setRoom(
-        await api<Room>(`/rooms/${code}`, {
-          headers: participantToken ? { "X-Participant-Token": participantToken } : undefined,
-        }),
-      );
-      setError("");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "방 정보를 불러오지 못했어요");
-    }
-  }, [code]);
-  useEffect(() => {
-    const initial = window.setTimeout(load, 0);
-    const t = setInterval(load, 4000);
-    return () => {
-      clearTimeout(initial);
-      clearInterval(t);
-    };
-  }, [load]);
-  useEffect(() => {
-    if (room?.status !== "DECIDED") return;
-    let active = true;
-    api<RestaurantSearch>(`/rooms/${code}/restaurants`)
-      .then((result) => {
-        if (active) setRestaurantSearch(result);
-      })
-      .catch(() => {
-        if (active) setRestaurantSearch(null);
-      });
-    return () => {
-      active = false;
-    };
-  }, [code, room?.status]);
-  async function act(fn: () => Promise<void>) {
-    setBusy(true);
-    setError("");
-    try {
-      await fn();
-      await load();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "다시 시도해주세요");
-    } finally {
-      setBusy(false);
-    }
-  }
-  async function join() {
-    await act(async () => {
-      const x = await api<{ participantToken: string }>(`/rooms/${code}/participants`, {
-        method: "POST",
-        body: JSON.stringify({ nickname: name }),
-      });
-      tokens.saveParticipant(code, x.participantToken);
-    });
-  }
-  async function prefer() {
-    await act(() =>
-      api(`/rooms/${code}/participants/me/preferences`, {
-        method: "PUT",
-        headers: { "X-Participant-Token": tokens.participant(code) ?? "" },
-        body: JSON.stringify({ likes: like, exclusions: exclude }),
-      }),
-    );
-  }
-  async function generate() {
-    await act(() =>
-      api(`/rooms/${code}/candidates`, {
-        method: "POST",
-        headers: { "X-Host-Token": tokens.host(code) ?? "" },
-      }),
-    );
-  }
-  if (error && !room) return <FullPageState icon="⏳" title={error} />;
+  const flow = useRoom(code);
+  const room = flow.room;
+  if (flow.error && !room) return <FullPageState icon="⏳" title={flow.error} />;
   if (!room) return <FullPageState icon="🍽️" title="모임방 불러오는 중…" />;
   if (room.status === "EXPIRED") return <FullPageState icon="🌙" title="이 모임방은 만료됐어요" />;
   if (room.status === "DECIDED" && room.decidedMenu) {
     const l = mapLinks(room.decidedMenu.name, room.placeName);
     return (
       <main className="flow">
-        <FlowHeader backHref="/" />
+        <ProductHeader backHref="/" />
         <section className="flowBody decided">
           <p className="resultEmoji">🎊</p>
           <p className="progress">메뉴 결정 완료</p>
@@ -122,13 +43,13 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
             <small>{room.decidedMenu.category}</small>
             <p>{room.decidedMenu.description}</p>
           </div>
-          {restaurantSearch?.restaurants.length ? (
+          {flow.restaurants?.restaurants.length ? (
             <section className="restaurants">
               <p className="progress">MOEAT PICKS</p>
-              <h2>{restaurantSearch.title}</h2>
-              <p className="muted">{restaurantSearch.description}</p>
+              <h2>{flow.restaurants.title}</h2>
+              <p className="muted">{flow.restaurants.description}</p>
               <div className="restaurantList">
-                {restaurantSearch.restaurants.map((restaurant) => (
+                {flow.restaurants.restaurants.map((restaurant) => (
                   <article className="restaurantCard" key={restaurant.id}>
                     <strong className="restaurantRank">{restaurant.rank}</strong>
                     <div>
@@ -170,7 +91,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   }
   return (
     <main className="flow">
-      <FlowHeader backHref="/" />
+      <ProductHeader backHref="/" />
       <section className="flowBody">
         <p className="progress">취향 모으는 중</p>
         <h1>{room.title}</h1>
@@ -184,17 +105,21 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
         </p>
         {room.status === "COLLECTING" && (
           <>
-            {!joined ? (
+            {!flow.joined ? (
               <div className="joinBox">
                 <h2>이름을 알려주세요</h2>
                 <p>가입 없이 바로 참여할 수 있어요.</p>
                 <input
                   maxLength={20}
                   placeholder="닉네임"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={flow.name}
+                  onChange={(event) => flow.setName(event.target.value)}
                 />
-                <button className="primary wide" disabled={!name.trim() || busy} onClick={join}>
+                <button
+                  className="primary wide"
+                  disabled={!flow.name.trim() || flow.busy}
+                  onClick={flow.join}
+                >
                   참여하기
                 </button>
               </div>
@@ -202,28 +127,21 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
               <div className="preference">
                 <h2>어떤 종류가 당기나요?</h2>
                 <p className="muted">음식 종류를 골라주세요. 여러 개 선택해도 좋아요.</p>
-                <ChoiceChips
-                  items={likes}
-                  values={like}
-                  onChange={(values) => {
-                    const added = values.find((value) => !like.includes(value));
-                    setLike(
-                      added === "상관없음"
-                        ? ["상관없음"]
-                        : values.filter((value) => value !== "상관없음"),
-                    );
-                  }}
-                />
+                <ChoiceChips items={likes} values={flow.likes} onChange={flow.changeLikes} />
                 <h2>이건 먹기 어려워요</h2>
                 <div className="notice">🛡️ 선택한 음식은 후보에서 제외돼요.</div>
-                <ChoiceChips items={exs} values={exclude} onChange={setExclude} />
-                <button className="primary wide" disabled={busy} onClick={prefer}>
+                <ChoiceChips items={exs} values={flow.exclusions} onChange={flow.setExclusions} />
+                <button
+                  className="primary wide"
+                  disabled={flow.busy}
+                  onClick={flow.savePreferences}
+                >
                   취향 저장하기
                 </button>
               </div>
             )}
             <Roster room={room} />
-            {host && (
+            {flow.host && (
               <>
                 <button
                   className="secondary wide"
@@ -234,11 +152,11 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
                 <button
                   className="primary wide"
                   disabled={
-                    busy ||
+                    flow.busy ||
                     room.participants.length === 0 ||
                     room.participants.some((p) => !p.ready)
                   }
-                  onClick={generate}
+                  onClick={flow.pickMenu}
                 >
                   모두 준비됐어요, 메뉴 뽑기
                 </button>
@@ -246,7 +164,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
             )}
           </>
         )}
-        {error && <p className="error">{error}</p>}
+        {flow.error && <p className="error">{flow.error}</p>}
       </section>
     </main>
   );
