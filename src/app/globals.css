@@ -958,7 +958,7 @@ footer {
   min-height: 100vh;
   margin: 0 auto;
   background: var(--white);
-  box-shadow: 0 0 70px rgba(23, 29, 40, 0.08);
+  box-shadow: none;
   position: relative;
 }
 
