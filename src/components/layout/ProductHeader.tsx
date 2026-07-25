@@ -1,11 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { SiteLogo } from "./SiteLogo";
+import { SiteLogo } from "@/components/SiteLogo";
 
-export function FlowHeader({ backHref }: { backHref?: string }) {
+type ProductHeaderProps = {
+  backHref?: string;
+};
+
+export function ProductHeader({ backHref }: ProductHeaderProps) {
   return (
-    <header>
+    <header className="productHeader [&>span]:text-[29px]">
       {backHref ? (
         <Link href={backHref} aria-label="이전 화면으로">
           ←

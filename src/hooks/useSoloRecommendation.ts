@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { api, Menu, SoloRestaurantSearch } from "@/lib/api";
+import { useSoloStore } from "@/stores/soloStore";
 
 function initialMeal() {
   const hour = new Date().getHours();
@@ -9,63 +10,44 @@ function initialMeal() {
 }
 
 export function useSoloRecommendation() {
-  const [step, setStep] = useState(0);
-  const [meal, setMeal] = useState(initialMeal);
-  const [budget, setBudget] = useState("ANY");
-  const [moods, setMoods] = useState<string[]>([]);
-  const [exclusions, setExclusions] = useState<string[]>([]);
-  const [place, setPlace] = useState("");
-  const [menus, setMenus] = useState<Menu[]>([]);
-  const [restaurants, setRestaurants] = useState<SoloRestaurantSearch | null>(null);
-  const [seenMenuIds, setSeenMenuIds] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const store = useSoloStore();
+  const { initialize, appendSeenMenus, ...state } = store;
+  useEffect(() => initialize(initialMeal()), [initialize]);
 
   async function recommend() {
-    setLoading(true);
-    setError("");
+    store.setLoading(true);
+    store.setError("");
     try {
       const recommendedMenus = await api<Menu[]>("/recommendations/solo", {
         method: "POST",
-        body: JSON.stringify({ mealTime: meal, budget, moods, exclusions, seenMenuIds }),
+        body: JSON.stringify({
+          mealTime: state.meal,
+          budget: state.budget,
+          moods: state.moods,
+          exclusions: state.exclusions,
+          seenMenuIds: state.seenMenuIds,
+        }),
       });
       const restaurantSearch = await api<SoloRestaurantSearch>("/restaurants/recommendations", {
         method: "POST",
         body: JSON.stringify({
-          placeName: place,
+          placeName: state.place,
           menuNames: recommendedMenus.map((menu) => menu.name),
         }),
       });
-      setMenus(recommendedMenus);
-      setRestaurants(restaurantSearch);
-      setSeenMenuIds((current) =>
-        [...current, ...recommendedMenus.map((menu) => menu.id)].slice(-30),
-      );
-      setStep(4);
+      store.setMenus(recommendedMenus);
+      store.setRestaurants(restaurantSearch);
+      appendSeenMenus(recommendedMenus.map((menu) => menu.id));
+      store.setStep(4);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "다시 시도해주세요");
+      store.setError(cause instanceof Error ? cause.message : "다시 시도해주세요");
     } finally {
-      setLoading(false);
+      store.setLoading(false);
     }
   }
 
   return {
-    step,
-    setStep,
-    meal,
-    setMeal,
-    budget,
-    setBudget,
-    moods,
-    setMoods,
-    exclusions,
-    setExclusions,
-    place,
-    setPlace,
-    menus,
-    restaurants,
-    loading,
-    error,
+    ...state,
     recommend,
   };
 }

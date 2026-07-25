@@ -1,5 +1,5 @@
 "use client";
-import { FlowHeader } from "@/components/FlowHeader";
+import { ProductHeader } from "@/components/layout/ProductHeader";
 import { DatePickerSheet } from "@/components/DatePickerSheet";
 import { LocationPickerSheet } from "@/components/LocationPickerSheet";
 import { FormChoiceField } from "@/components/FormChoiceField";
@@ -17,7 +17,7 @@ export default function NewRoom() {
   const form = useNewRoomForm();
   return (
     <main className="flow flowWide">
-      <FlowHeader backHref="/choose" />
+      <ProductHeader backHref="/choose" />
       <form className="flowBody form" onSubmit={form.submit}>
         <p className="progress">모임 만들기</p>
         <h1>어떤 식사 약속인가요?</h1>

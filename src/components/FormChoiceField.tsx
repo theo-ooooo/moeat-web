@@ -11,7 +11,7 @@ type FormChoiceFieldProps = {
 export function FormChoiceField({ id, label, items, value, onChange }: FormChoiceFieldProps) {
   return (
     <section className="mt-[30px] [&_button]:min-w-[104px] [&_button]:flex-1" aria-labelledby={id}>
-      <h2 id={id} className="mb-3 text-sm font-extrabold">
+      <h2 id={id} className="mb-3 text-sm font-bold">
         {label}
       </h2>
       <ChoiceChips
