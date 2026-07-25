@@ -9,7 +9,7 @@ type ProductHeaderProps = {
 
 export function ProductHeader({ backHref }: ProductHeaderProps) {
   return (
-    <header className="productHeader">
+    <header className="productHeader [&>span]:text-[29px]">
       {backHref ? (
         <Link href={backHref} aria-label="이전 화면으로">
           ←
