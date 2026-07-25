@@ -26,7 +26,7 @@ export function ChoiceChips({ items, values, onChange, max = items.length }: Cho
           <button
             type="button"
             key={item}
-            className={`min-h-[50px] cursor-pointer rounded-[14px] border px-[18px] font-bold transition-colors ${
+            className={`min-h-[50px] cursor-pointer rounded-[14px] border px-[18px] text-[15px] font-semibold transition-colors ${
               selected
                 ? "border-[var(--brand)] bg-[var(--brand-soft)] text-[var(--brand)]"
                 : "border-transparent bg-[var(--surface)] text-[#5e6675] hover:bg-[#eceff3]"

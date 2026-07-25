@@ -1005,6 +1005,18 @@ footer {
   padding: 64px 34px 90px;
 }
 
+.flow .progress {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+}
+
+.flow .primary,
+.flow .secondary {
+  font-size: 15px;
+  font-weight: 700;
+}
+
 .desktopRail {
   width: 280px;
   display: block;
@@ -1067,15 +1079,18 @@ footer {
   }
 }
 
-.flowBody > h1 {
+.flowBody h1 {
   margin: 13px 0 10px;
-  font-size: clamp(34px, 4vw, 46px);
-  line-height: 1.25;
-  letter-spacing: -0.05em;
+  font-size: clamp(36px, 3.4vw, 44px);
+  font-weight: 750;
+  line-height: 1.22;
+  letter-spacing: -0.045em;
 }
 
 .muted {
   color: var(--muted);
+  font-size: 16px;
+  font-weight: 450;
   line-height: 1.65;
 }
 
@@ -1291,7 +1306,8 @@ footer {
 .flowBody > h2,
 .preference h2 {
   margin: 36px 0 14px;
-  font-size: 19px;
+  font-size: 20px;
+  font-weight: 700;
   letter-spacing: -0.025em;
 }
 
@@ -1463,7 +1479,7 @@ footer {
   margin-top: 26px;
   display: block;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .form label small {
@@ -1833,6 +1849,9 @@ footer {
 .joinBox h2,
 .roster h2 {
   margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
 }
 
 .joinBox p,
@@ -2222,8 +2241,9 @@ footer {
     padding: 42px 22px 110px;
   }
 
-  .flowBody > h1 {
-    font-size: 32px;
+  .flowBody h1 {
+    font-size: 31px;
+    line-height: 1.26;
   }
 
   .choiceGrid,
