@@ -38,7 +38,9 @@ export default function SoloPage() {
                   onChange={(values) => flow.setMeal(values[0])}
                   max={1}
                 />
-                <h3>예산은 어느 정도인가요?</h3>
+                <h2 className="mt-9 mb-3 text-xl font-bold tracking-[-0.025em]">
+                  예산은 어느 정도인가요?
+                </h2>
                 <ChoiceChips
                   items={budgets.map((item) => item[1])}
                   values={[budgets.find((item) => item[0] === flow.budget)![1]]}
